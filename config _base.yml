@@ -1,0 +1,45 @@
+---
+lastIp: 127.0.0.1 # Used to check if update needed
+username: # Your email
+password: # Your password
+sites:
+  site1:
+    name: # example.tk
+    domainid: # domain id, found in url
+    records:
+      0:
+        line:
+        type: A
+        name:
+        ttl: 300
+        value: _IP_ # _IP_ will be replaced with your public ip
+      1:
+        line:
+        type: A
+        name: WWW
+        ttl: 300
+        value: _IP_
+      2:
+        line:
+        type: MX
+        name:
+        ttl: 300
+        value: example.tk
+        priority: 10
+
+  site2:
+    name: # example2.tk
+    domainid: # domain id, found in url
+    records: 
+      0:
+        line:
+        type: A
+        name:
+        ttl: 300
+        value: _IP_
+      1:
+        line:
+        type: A
+        name: WWW
+        ttl: 300
+        value: _IP_

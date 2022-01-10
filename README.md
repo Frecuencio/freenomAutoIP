@@ -21,7 +21,7 @@ https://my.freenom.com/clientarea.php?action=domains
 Take the id from the url:
 https://my.freenom.com/clientarea.php?action=domaindetails&id=*TAKETHISNUMBER*
 
-`
+```
 ---
 lastIp: 127.0.0.1 # Used to check if update needed
 username: # Your email
@@ -67,7 +67,7 @@ sites:
         name: WWW
         ttl: 300
         value: _IP_
-`
+```
 
 # Work In Progress 👷‍♂️: #
 

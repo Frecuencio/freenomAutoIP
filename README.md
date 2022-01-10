@@ -19,7 +19,7 @@ Click "Manage Domain" on the desired domain
 https://my.freenom.com/clientarea.php?action=domains 
 
 Take the id from the url:
-https://my.freenom.com/clientarea.php?action=domaindetails&id=**TakeThisNumber**
+https://my.freenom.com/clientarea.php?action=domaindetails&id= __TakeThisNumber__
 
 ```
 ---

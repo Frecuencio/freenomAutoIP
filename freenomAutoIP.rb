@@ -1,6 +1,7 @@
 # Ruby freeNom update IP
 require 'net/http'
 require 'yaml'
+require 'logger'
 
 
 class FreeNomUpdater
@@ -24,6 +25,10 @@ class FreeNomUpdater
         @YAML_FILE = File.join(__dir__, 'config.yml')
         @saved_config = nil
 
+        # LOGGER
+        @logger = Logger.new(STDOUT) # TODO: Check env vars
+        @logger.level = Logger::DEBUG
+
         # LOAD CONFIG FILE
         self.loadYamlFile
     end
@@ -46,6 +51,7 @@ class FreeNomUpdater
 
     def getWithCookies(url:, redirectNo: 0, data: nil)
         url = (data.nil?) ? url : url + '?' + self.buildQueryString(data)
+        @logger.debug("GET: #{url}")
         res = @httpConn.get(url, 
                 (@cookies.nil?) ? {'User-Agent' => @USER_AGENT} 
                     : { 'User-Agent' => @USER_AGENT, 'Cookie' => @cookies }
@@ -56,12 +62,14 @@ class FreeNomUpdater
             res = getWithCookies(url: '/' + res['location'], redirectNo: redirectNo+=1)
         elsif res.code == '302' && redirectNo >= @MAX_GET_REDIRECTS 
             # Stop loop redirect
+            @logger.error("Max GET redirects reached (#{redirectNo}): #{@BASE_URL}#{url}")
             raise "Max GET redirects reached (#{redirectNo})"
         end
         return res
     end
 
     def postWithCookies(url:, data:'')
+        @logger.debug("POST: #{url}  [#{data}]")
         res = @httpConn.post(url, data, {'User-Agent' => @USER_AGENT,
                                          'Cookie' => (@cookies.nil?) ? '' : @cookies,
                                          'Content-type' => 'application/x-www-form-urlencoded',
@@ -75,9 +83,11 @@ class FreeNomUpdater
     def getTokenValue(body)
         res = /<input type="hidden" name="token" value="[a-zA-Z0-9]*" \/>/.match(body)
         if res.nil?
+            @logger.error("Token not found")
             raise "Error: token not found"
         end
         @token = res[0][41..-5]
+        @logger.debug("New token: #{token}")
     end
 
     def visitLogin
@@ -89,6 +99,7 @@ class FreeNomUpdater
         query = self.buildQueryString({'token' => @token, 'username' => @saved_config['username'], 'password' => @saved_config['password']})
         response = self.postWithCookies(url: @LOGIN_URL, data:query)
         if response['location'] == '/clientarea.php?incorrect=true'
+            @logger.error("Incorrect login")
             raise 'Incorrect login data'
         end
     end
@@ -123,7 +134,7 @@ class FreeNomUpdater
     def ipChanged?
         @public_ip = Net::HTTP.get URI @IP_CHECK_URL
         if @saved_config['lastIp'] != @public_ip
-            puts "IP changed! #{@saved_config['lastIp']} -> #{@public_ip}"
+            @logger.info("IP changed! #{@saved_config['lastIp']} -> #{@public_ip}")
             return true
         end
         return false
@@ -131,6 +142,7 @@ class FreeNomUpdater
 
     def loadYamlFile()
         if !File.exists?(@YAML_FILE)
+            @logger.error("Config file doesn't exists")
             raise "COULD NOT OPEN FILE"
         end
         @saved_config = YAML::load_file(@YAML_FILE)
@@ -143,6 +155,7 @@ class FreeNomUpdater
 
     def run
         if !self.ipChanged?
+            @logger.info("ip not changed (#{@public_ip})")
             return
         end
         self.visitLogin

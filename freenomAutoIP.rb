@@ -1,4 +1,4 @@
-#!/usr/bin/ruby -w
+#!/usr/bin/env ruby
 # Ruby freeNom update IP
 #
 # Created by: Carlos Martín Arnillas
@@ -16,7 +16,7 @@ class FreeNomUpdater
     def initialize
         @USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'
         @BASE_PORT = 443
-        @MAX_GET_REDIRECTS = 3
+        @MAX_GET_REDIRECTS = 5
         # URL VARS
         @BASE_URL = 'my.freenom.com'
         @CLIENT_AREA_URL = '/clientarea.php'
@@ -29,7 +29,6 @@ class FreeNomUpdater
         @httpConn.use_ssl = true
         @token = nil
         # COOKIE JAR
-        @cookies_hashes = []
         @cookies = nil
         # YAML FILE
         @YAML_FILE = ENV['FNIP_CONFIG'] || File.join(__dir__, 'config.yml')
@@ -52,9 +51,9 @@ class FreeNomUpdater
         if cookies.nil?
             return
         end
-        @cookies_hashes = @cookies_hashes.concat cookies
+
         cookies_array = Array.new
-        @cookies_hashes.each { | cookie |
+        cookies.each { | cookie |
             cookies_array.push(cookie.split('; ')[0])
         }
         @cookies = cookies_array.join('; ')
@@ -156,7 +155,7 @@ class FreeNomUpdater
     end 
 
     def loadYamlFile()
-        if !File.exists?(@YAML_FILE)
+        if !File.exist?(@YAML_FILE)
             @logger.error("Config file doesn't exists")
             raise "COULD NOT OPEN FILE"
         end

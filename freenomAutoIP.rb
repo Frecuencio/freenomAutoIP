@@ -92,7 +92,6 @@ class FreenomUpdater
     return res
   end
 
-  # Parse csrf token balue
   def get_token_value(body)
     res = /<input type="hidden" name="token" value="[a-zA-Z0-9]*" \/>/.match(body)
     if res.nil?

@@ -56,5 +56,6 @@ build-iPhoneSimulator/
 # .rubocop-https?--*
 
 
-# Do not upload config file, prevents uploading private passwords
+# Do not upload config file and logs, prevents uploading private passwords
 config.yml
+*.log

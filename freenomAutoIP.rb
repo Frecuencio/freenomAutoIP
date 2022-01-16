@@ -2,8 +2,8 @@
 # Ruby freeNom update IP
 #
 # Created by: Carlos Martín Arnillas
-# Version 0.1
-# Last update: 15/01/2022
+# Version 0.2
+# Last update: 16/01/2022
 # License: GNU General Public License v3.0
 #
 
@@ -33,7 +33,6 @@ class FreenomUpdater
     # YAML FILE
     @YAML_FILE = ENV['FNIP_CONFIG'] || File.join(__dir__, 'config.yml')
     @saved_config = nil
-
     # LOGGER
     @logger = Logger.new(ENV['FNIP_LOG'] || STDOUT) # TODO: Check env vars Logger.new('foo.log', 10, 1024000)
     @logger.level = ENV['FNIP_LOGLEVEL'] || Logger::INFO
@@ -48,10 +47,7 @@ class FreenomUpdater
 
   # Dirty cookie jar implementation
   def store_cookies(cookies)
-    if cookies.nil?
-      return
-    end
-
+    return if cookies.nil?
     cookies_array = Array.new
     cookies.each { | cookie |
       cookies_array.push(cookie.split('; ')[0])
